@@ -1,5 +1,5 @@
 /******************************************************************************
-** Copyright (C) 2016 The Qt Company with modifications by Laird
+** Copyright (C) 2016 The Qt Company with modifications by Ezurio
 **
 ** Project: UwTerminalX
 **

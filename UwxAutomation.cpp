@@ -1,5 +1,5 @@
 /******************************************************************************
-** Copyright (C) 2015-2023 Laird Connectivity
+** Copyright (C) 2015-2024 Ezurio
 **
 ** Project: UwTerminalX
 **

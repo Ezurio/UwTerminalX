@@ -1,5 +1,5 @@
 /******************************************************************************
-** Copyright (C) 2015-2023 Laird Connectivity
+** Copyright (C) 2015-2024 Ezurio
 **
 ** Project: UwTerminalX
 **
@@ -948,7 +948,7 @@ private:
     QList<FileSStruct *> lstFileData; //Holds a list of filenames and line numbers for the file currently being XCompiled
 #ifdef UseSSL
     QString WebProtocol; //Holds HTTP or HTTPS depending on options selected
-    QSslCertificate *sslcLairdSSLNew = NULL; //Holds the (newer) Laird SSL certificate
+    QSslCertificate *sslcEzurioSSLNew = NULL; //Holds the (newer) Ezurio SSL certificate
 #endif
     PopupMessage *gpmErrorForm; //Error message form
 #if SKIPAUTOMATIONFORM != 1

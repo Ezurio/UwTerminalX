@@ -1,8 +1,8 @@
-# Laird Connectivity UwTerminalX
+# Ezurio UwTerminalX
 
 ## About
 
-UwTerminalX is a cross-platform utility for communicating and downloading applications onto Laird's range of wireless modules, and uses Qt 5 or 6. The code uses functionality only supported in Qt 5.7 or greater but with some slight modifications will compile and run fine on earlier versions of Qt 5 (with no loss of functionality). UwTerminalX has been tested on Windows, Mac, Arch Linux and Ubuntu Linux and on the [Raspberry Pi running Raspbian](/docs/images/rpi.png?raw=true).
+UwTerminalX is a cross-platform utility for communicating and downloading applications onto Ezurio's range of wireless modules, and uses Qt 5 or 6. The code uses functionality only supported in Qt 5.7 or greater but with some slight modifications will compile and run fine on earlier versions of Qt 5 (with no loss of functionality). UwTerminalX has been tested on Windows, Mac, Arch Linux and Ubuntu Linux and on the [Raspberry Pi running Raspbian](/docs/images/rpi.png?raw=true).
 
 ## Downloading
 
@@ -38,7 +38,7 @@ Before running, you may need to install some additional libraries, please see ht
 
 There are various instructions and help pages available on the [wiki site](https://github.com/LairdCP/UwTerminalX/wiki/).
 
-Laird encourages people to branch/fork UwTerminalX to modify the code and accepts pull requests to merge these changes back into the main repository.
+Ezurio encourages people to branch/fork UwTerminalX to modify the code and accepts pull requests to merge these changes back into the main repository.
 
 ## Mailing list/discussion
 

@@ -1,5 +1,5 @@
 /******************************************************************************
-** Copyright (C) 2015-2023 Laird Connectivity
+** Copyright (C) 2015-2024 Ezurio
 **
 ** Project: UwTerminalX
 **
@@ -667,10 +667,10 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     //Set Online XCompilation mode
 #ifdef _WIN32
     //Windows
-    ui->label_OnlineXCompInfo->setText("By enabling Online XCompilation support, if a local XCompiler is not found, the source code will be uploaded and compiled remotely on a Laird Connectivity server. Uploaded file data is not stored by Laird Connectivity but IP addresses are stored in access logs which are used for security purposes only.");
+    ui->label_OnlineXCompInfo->setText("By enabling Online XCompilation support, if a local XCompiler is not found, the source code will be uploaded and compiled remotely on an Ezurio server. Uploaded file data is not stored by Ezurio but IP addresses are stored in access logs which are used for security purposes only.");
 #else
     //Mac or Linux
-    ui->label_OnlineXCompInfo->setText("By enabling Online XCompilation support, when compiling an application, the source data will be uploaded and compiled remotely on a Laird Connectivity server. Uploaded file data is not stored by Laird Connectivity but IP addresses are stored in access logs which are used for security purposes only.");
+    ui->label_OnlineXCompInfo->setText("By enabling Online XCompilation support, when compiling an application, the source data will be uploaded and compiled remotely on an Ezurio server. Uploaded file data is not stored by Ezurio but IP addresses are stored in access logs which are used for security purposes only.");
 #endif
     ui->check_OnlineXComp->setChecked(gpTermSettings->value("OnlineXComp", DefaultOnlineXComp).toBool());
 
@@ -727,8 +727,8 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     {
         //Load certificate data
         QSslConfiguration sslcConfig;
-        sslcLairdSSLNew = new QSslCertificate(certFile.readAll());
-        sslcConfig.addCaCertificate(*sslcLairdSSLNew);
+        sslcEzurioSSLNew = new QSslCertificate(certFile.readAll());
+        sslcConfig.addCaCertificate(*sslcEzurioSSLNew);
         certFile.close();
     }
 #endif
@@ -1231,10 +1231,10 @@ MainWindow::~MainWindow()
     }
 
 #ifdef UseSSL
-    if (sslcLairdSSLNew != NULL)
+    if (sslcEzurioSSLNew != NULL)
     {
         //Clear up (newer) SSL certificate
-        delete sslcLairdSSLNew;
+        delete sslcEzurioSSLNew;
     }
 #endif
 
@@ -1765,7 +1765,7 @@ MainWindow::SerialRead(
                     if (remTempLicREM.hasMatch() == true && remTempLicREM.captured(1).toUpper() == "0016A4C0FFEE")
                     {
                         //License is not valid, display a warning to the user
-                        QString strMessage = tr("Please note: The module you are downloading to does not have a valid license and therefore some firmware functionality may not work or return unexpected error codes.\r\n\r\nTo fix this issue, please add your module license using: 'at+lic <license code>', or contact Laird Connectvity Support with the module Bluetooth Address if you do not have a backup of the license code (issue the command 'at i 14' to get your module's Bluetooth address).");
+                        QString strMessage = tr("Please note: The module you are downloading to does not have a valid license and therefore some firmware functionality may not work or return unexpected error codes.\r\n\r\nTo fix this issue, please add your module license using: 'at+lic <license code>', or contact Ezurio Support with the module Bluetooth Address if you do not have a backup of the license code (issue the command 'at i 14' to get your module's Bluetooth address).");
                         gpmErrorForm->show();
                         gpmErrorForm->SetMessage(&strMessage);
                     }
@@ -1893,7 +1893,7 @@ MainWindow::SerialRead(
                                 ;
                             }
 
-                            strMessage.append("\" was not found.\r\n\r\nPlease ensure you put XCompile binaries in the correct directory (").append(gpTermSettings->value("CompilerDir", DefaultCompilerDir).toString()).append((gpTermSettings->value("CompilerSubDirs", DefaultCompilerSubDirs).toBool() == true ? strDevName : "")).append(").\n\nYou can also enable Online XCompilation from the 'Config' tab to XCompile applications using Laird Connectivity's online server.");
+                            strMessage.append("\" was not found.\r\n\r\nPlease ensure you put XCompile binaries in the correct directory (").append(gpTermSettings->value("CompilerDir", DefaultCompilerDir).toString()).append((gpTermSettings->value("CompilerSubDirs", DefaultCompilerSubDirs).toBool() == true ? strDevName : "")).append(").\n\nYou can also enable Online XCompilation from the 'Config' tab to XCompile applications using Ezurio's online server.");
                             gpmErrorForm->show();
                             gpmErrorForm->SetMessage(&strMessage);
                             gbTermBusy = false;
@@ -5221,7 +5221,7 @@ MainWindow::replyFinished(
                 if (ui->check_EnableModuleFirmwareCheck->isChecked() && nrReply->hasRawHeader("Firmware-Latest") && gpTermSettings->value(QString("FWCheckLatest").append(strTmpDevID), "0.0.0.0").toString() != nrReply->rawHeader("Firmware-Latest"))
                 {
                     //Checked for latest firmware and there is a newer version available
-                    QMessageBox::information(this, "Module firmware outdated", QString("There is a new firmware available for your ").append(strTmpDevID).append(" module, version ").append(nrReply->rawHeader("Firmware-Latest")).append(". You can download this from the Laird Connectivity website.\r\n\r\nThis message will not be shown again for this module unless a newer firmware is released."), QMessageBox::Ok);
+                    QMessageBox::information(this, "Module firmware outdated", QString("There is a new firmware available for your ").append(strTmpDevID).append(" module, version ").append(nrReply->rawHeader("Firmware-Latest")).append(". You can download this from the Ezurio website.\r\n\r\nThis message will not be shown again for this module unless a newer firmware is released."), QMessageBox::Ok);
                     gpTermSettings->setValue(QString("FWCheckLatest").append(strTmpDevID), nrReply->rawHeader("Firmware-Latest"));
                 }
 
@@ -5702,7 +5702,7 @@ MainWindow::sslErrors(
     )
 {
     //Error detected with SSL
-    if (sslcLairdSSLNew != NULL && nrReply->sslConfiguration().peerCertificate() == *sslcLairdSSLNew)
+    if (sslcEzurioSSLNew != NULL && nrReply->sslConfiguration().peerCertificate() == *sslcEzurioSSLNew)
     {
         //Server certificate matches
         nrReply->ignoreSslErrors(lstSSLErrors);
@@ -6195,7 +6195,7 @@ MainWindow::on_btn_Help_clicked(
     else
     {
         //File not present, open on website instead
-        if (QDesktopServices::openUrl(QUrl(QString("http://").append(ServerHost).append("/uwterminalx_help.pdf"))) == false)
+        if (QDesktopServices::openUrl(QUrl(QString("https://www.ezurio.com/documentation/uwterminalx-quick-reference-guide"))) == false)
         {
             //Failed to open
             QString strMessage = tr("Help file (Help.pdf) was not found and an error occured whilst attempting to open the online version.");
@@ -6477,7 +6477,7 @@ MainWindow::on_btn_WebBrowse_clicked(
     else if (ui->combo_WebSelection->currentIndex() == WebSelectionWirelessModules)
     {
         //Wireless modules page
-        strURL = "https://www.lairdconnect.com/wireless-modules";
+        strURL = "https://www.ezurio.com/wireless-modules";
     }
     else if (ui->combo_WebSelection->currentIndex() == WebSelectionUwFlashX)
     {
@@ -7387,7 +7387,7 @@ MainWindow::DetectBaudTimeout(
             ui->btn_Cancel->setEnabled(false);
 
             //Output failure message
-            QString strMessage = tr("Failed to detect a Laird Connectivity module on port ").append(ui->combo_COM->currentText()).append(".\r\nPlease check that all cables are connected properly, switches are correctly set, VSP mode is disabled and that there is no autorun application running.");
+            QString strMessage = tr("Failed to detect an Ezurio module on port ").append(ui->combo_COM->currentText()).append(".\r\nPlease check that all cables are connected properly, switches are correctly set, VSP mode is disabled and that there is no autorun application running.");
             gpmErrorForm->show();
             gpmErrorForm->SetMessage(&strMessage);
         }
@@ -9134,7 +9134,7 @@ MainWindow::on_btn_ExitAutorun_clicked(
     if (spiSerialInfo.isValid() && spiSerialInfo.manufacturer().indexOf("FTDI") != -1)
     {
         //Valid FTDI device, proceed
-        if (QMessageBox::question(this, "Exit autorun?", QString("This feature allows BL654 USB dongles (Product Code: 451-00003) with an active autorun application to be placed into interactive mode for firmware/application upgrading. Note this only works with the BL654 USB dongle and using it with the wrong device may cause unforeseen issues with the device which Laird Connectivity claims no responsibility and accepts no liability for.\r\n\r\nAre you sure ").append(ui->combo_COM->currentText()).append(" is the correct port and '").append(ui->label_SerialInfo->text()).append("' the correct description for your device?"), QMessageBox::Yes, QMessageBox::No) == QMessageBox::Yes)
+        if (QMessageBox::question(this, "Exit autorun?", QString("This feature allows BL654 USB dongles (Product Code: 451-00003) with an active autorun application to be placed into interactive mode for firmware/application upgrading. Note this only works with the BL654 USB dongle and using it with the wrong device may cause unforeseen issues with the device which Ezurio claims no responsibility and accepts no liability for.\r\n\r\nAre you sure ").append(ui->combo_COM->currentText()).append(" is the correct port and '").append(ui->label_SerialInfo->text()).append("' the correct description for your device?"), QMessageBox::Yes, QMessageBox::No) == QMessageBox::Yes)
         {
             //Windows, MSVC build
             FT_STATUS ftsStatus;
@@ -9389,7 +9389,7 @@ MainWindow::on_btn_ExitAutorun_clicked(
     QSerialPortInfo spiSerialInfo(ui->combo_COM->currentText());
     if (!spiSerialInfo.isNull() && spiSerialInfo.manufacturer().indexOf("FTDI") != -1)
     {
-        if (QMessageBox::question(this, "Exit autorun?", QString("This feature allows BL654 USB dongles (Product Code: 451-00003) with an active autorun application to be placed into interactive mode for firmware/application upgrading. Note this only works with the BL654 USB dongle and using it with the wrong device may cause unforeseen issues with the device which Laird Connectivity claims no responsibility and accepts no liability for.\r\n\r\nAre you sure ").append(ui->combo_COM->currentText()).append(" is the correct port and '").append(ui->label_SerialInfo->text()).append("' the correct description for your device?\r\n\r\nNote that you require libftdi and libusb (version 1.0) for this to work."), QMessageBox::Yes, QMessageBox::No) == QMessageBox::Yes)
+        if (QMessageBox::question(this, "Exit autorun?", QString("This feature allows BL654 USB dongles (Product Code: 451-00003) with an active autorun application to be placed into interactive mode for firmware/application upgrading. Note this only works with the BL654 USB dongle and using it with the wrong device may cause unforeseen issues with the device which Ezurio claims no responsibility and accepts no liability for.\r\n\r\nAre you sure ").append(ui->combo_COM->currentText()).append(" is the correct port and '").append(ui->label_SerialInfo->text()).append("' the correct description for your device?\r\n\r\nNote that you require libftdi and libusb (version 1.0) for this to work."), QMessageBox::Yes, QMessageBox::No) == QMessageBox::Yes)
         {
             //Exit autorun mode
             struct ftdi_context *ftContext;
