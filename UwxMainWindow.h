@@ -1,5 +1,5 @@
 /******************************************************************************
-** Copyright (C) 2015-2024 Ezurio
+** Copyright (C) 2015 Ezurio
 **
 ** Project: UwTerminalX
 **
@@ -139,7 +139,7 @@ const qint8 MODE_UPDATE_ERROR_CODE              = 16;
 const qint8 MODE_CHECK_FIRMWARE_VERSIONS        = 17;
 const qint8 MODE_CHECK_FIRMWARE_SUPPORT         = 18;
 //Constants for version and functions
-const QString UwVersion                         = "1.17"; //Version string
+const QString UwVersion                         = "2.0.0"; //Version string
 //Constants for timeouts and streaming
 const qint16 FileReadBlock                      = 512;     //Number of bytes to read per block when streaming files
 const qint16 StreamProgress                     = 10000;   //Number of bytes between streaming progress updates
