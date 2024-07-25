@@ -9131,7 +9131,11 @@ MainWindow::on_btn_ExitAutorun_clicked(
 #ifdef _WIN32
 #ifdef _MSC_VER
     QSerialPortInfo spiSerialInfo(ui->combo_COM->currentText());
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
     if (spiSerialInfo.isValid() && spiSerialInfo.manufacturer().indexOf("FTDI") != -1)
+#else
+    if (spiSerialInfo.manufacturer().indexOf("FTDI") != -1)
+#endif
     {
         //Valid FTDI device, proceed
         if (QMessageBox::question(this, "Exit autorun?", QString("This feature allows BL654 USB dongles (Product Code: 451-00003) with an active autorun application to be placed into interactive mode for firmware/application upgrading. Note this only works with the BL654 USB dongle and using it with the wrong device may cause unforeseen issues with the device which Ezurio claims no responsibility and accepts no liability for.\r\n\r\nAre you sure ").append(ui->combo_COM->currentText()).append(" is the correct port and '").append(ui->label_SerialInfo->text()).append("' the correct description for your device?"), QMessageBox::Yes, QMessageBox::No) == QMessageBox::Yes)

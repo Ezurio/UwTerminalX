@@ -1,0 +1,116 @@
+name: Build
+
+on:
+  push:
+    branches: [ "master", "develop" ]
+  pull_request:
+    branches: [ "master", "develop" ]
+
+jobs:
+
+  get_version:
+    runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.get_version.outputs.version }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Get version
+        id: get_version
+        run: echo "version=$(grep "UwVersion" UwxMainWindow.h | cut -f2 -d'"')" >> $GITHUB_OUTPUT
+
+  linux:
+
+    needs: get_version
+
+    strategy:
+      fail-fast: false
+      matrix:
+        qt_version: ["5.15.2", "6.2.4"]
+
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4    
+    
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libftdi1-dev libusb-1.0-0-dev libudev-dev libssl-dev
+
+      - name: Install Qt
+        uses: jurplel/install-qt-action@v4
+        with:
+          version: ${{ matrix.qt_version }}
+          host: linux
+          arch: gcc_64
+          modules: ${{ matrix.qt_version == '6.2.4' && 'qtserialport' || '' }}
+
+      - name: Build
+        run: |
+          qmake -o Makefile UwTerminalX.pro -spec linux-g++ CONFIG+=qtquickcompiler
+          make
+          strip UwTerminalX
+          curl -o codes.csv http://uwterminalx.ezurio.com/codes.csv
+          curl -o Help.pdf http://uwterminalx.ezurio.com/Help.pdf
+
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: UwTerminalX_v${{ env.UWTERMINALX_VERSION }}_qt${{ matrix.qt_version }}-linux
+          path: |
+            UwTerminalX
+            codes.csv
+            Help.pdf
+        env:
+          UWTERMINALX_VERSION: ${{ needs.get_version.outputs.version }}
+
+  windows:
+
+    needs: get_version
+
+    strategy:
+      fail-fast: false
+      matrix:
+        qt_version: ["5.15.2", "6.2.4"]
+
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install Qt
+        uses: jurplel/install-qt-action@v4
+        with:
+          version: ${{ matrix.qt_version }}
+          host: windows
+          arch: win64_msvc2019_64
+          modules: ${{ matrix.qt_version == '6.2.4' && 'qtserialport' || '' }}
+
+      - name: Set up Visual Studio shell
+        uses: egor-tensin/vs-shell@v2
+        with:
+          arch: x64
+
+      - name: Build
+        run: |
+          qmake.exe .
+          nmake.exe clean
+          set CL=/MP
+          nmake.exe release
+          curl -o help.pdf http://uwterminalx.ezurio.com/help.pdf
+          curl -o codes.csv http://uwterminalx.ezurio.com/codes.csv
+
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: UwTerminalX_v${{ env.UWTERMINALX_VERSION }}_qt${{ matrix.qt_version }}-windows
+          path: |
+            release/UwTerminalX.exe
+            codes.csv
+            Help.pdf
+        env:
+          UWTERMINALX_VERSION: ${{ needs.get_version.outputs.version }}

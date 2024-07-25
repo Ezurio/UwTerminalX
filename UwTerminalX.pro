@@ -112,3 +112,5 @@ win32:RC_ICONS = images/UwTerminal32.ico
 
 #Mac application icon
 ICON = MacUwTerminalXIcon.icns
+
+QMAKE_CXXFLAGS += "-fno-sized-deallocation"
