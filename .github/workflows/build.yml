@@ -1,13 +1,10 @@
 name: Build
-
 on:
   push:
-    branches: [ "master", "develop" ]
+    branches: ["master", "develop"]
   pull_request:
-    branches: [ "master", "develop" ]
-
+    branches: ["master", "develop"]
 jobs:
-
   get_version:
     runs-on: ubuntu-latest
     outputs:
@@ -15,39 +12,32 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-
       - name: Get version
         id: get_version
         run: echo "version=$(grep "UwVersion" UwxMainWindow.h | cut -f2 -d'"')" >> $GITHUB_OUTPUT
-
-  linux:
-
+  linux_dynamic:
     needs: get_version
-
     strategy:
       fail-fast: false
       matrix:
-        qt_version: ["5.15.2", "6.2.4"]
-
+        qt_version:
+          - "5.15.2"
+          - "6.7.1"
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout
-        uses: actions/checkout@v4    
-    
+        uses: actions/checkout@v4
       - name: Install dependencies
         run: |
           sudo apt-get update
           sudo apt-get install -y libftdi1-dev libusb-1.0-0-dev libudev-dev libssl-dev
-
       - name: Install Qt
         uses: jurplel/install-qt-action@v4
         with:
           version: ${{ matrix.qt_version }}
           host: linux
-          arch: gcc_64
-          modules: ${{ matrix.qt_version == '6.2.4' && 'qtserialport' || '' }}
-
+          arch: ${{ startsWith(matrix.qt_version, '6') && 'linux_gcc_64' || 'gcc_64' }}
+          modules: ${{ startsWith(matrix.qt_version, '6') && 'qtserialport' || '' }}
       - name: Build
         run: |
           qmake -o Makefile UwTerminalX.pro -spec linux-g++ CONFIG+=qtquickcompiler
@@ -55,46 +45,107 @@ jobs:
           strip UwTerminalX
           curl -o codes.csv http://uwterminalx.ezurio.com/codes.csv
           curl -o Help.pdf http://uwterminalx.ezurio.com/Help.pdf
-
       - name: Upload build artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: UwTerminalX_v${{ env.UWTERMINALX_VERSION }}_qt${{ matrix.qt_version }}-linux
+          name: UwTerminalX_v${{ env.UWTERMINALX_VERSION }}_qt${{ matrix.qt_version }}-linux_dynamic
           path: |
             UwTerminalX
             codes.csv
             Help.pdf
         env:
           UWTERMINALX_VERSION: ${{ needs.get_version.outputs.version }}
-
-  windows:
-
+  linux_static:
     needs: get_version
-
     strategy:
       fail-fast: false
       matrix:
-        qt_version: ["5.15.2", "6.2.4"]
-
-    runs-on: windows-latest
-
+        qt_version:
+          - "5.15.14"
+          - "6.7.1"
+    runs-on: ubuntu-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libftdi1-dev libusb-1.0-0-dev libudev-dev libssl-dev libgl1-mesa-dev libfontconfig1-dev libfreetype6-dev libx11-dev libx11-xcb-dev libxext-dev libxfixes-dev libxi-dev libxrender-dev libxcb1-dev libxcb-glx0-dev libxcb-keysyms1-dev libxcb-image0-dev libxcb-shm0-dev libxcb-icccm4-dev libxcb-sync-dev libxcb-xfixes0-dev libxcb-shape0-dev libxcb-randr0-dev libxcb-render-util0-dev libxcb-util-dev libxcb-xinerama0-dev libxcb-xkb-dev libxkbcommon-dev libxkbcommon-x11-dev libatspi2.0-dev dbus-x11 libpcre2-dev libclang-dev '^libxcb.*-dev' libx11-xcb-dev libglu1-mesa-dev libxrender-dev libxi-dev libxkbcommon-dev libxkbcommon-x11-dev
+        shell: bash
+      - name: Cache Qt static build
+        id: cache-qt-static
+        uses: actions/cache@v4
+        env:
+          cache-name: cache-qt-${{ matrix.qt_version }}-linux-static
+        with:
+          path: ${{ runner.temp }}/Qt${{ matrix.qt_version }}-static
+          key: qt-${{ matrix.qt_version }}-linux-static
+      - name: Install Qt5
+        if: ${{ startsWith(matrix.qt_version, '5') && steps.cache-qt-static.outputs.cache-hit != 'true' }}
+        working-directory: ${{ runner.temp }}
+        run: |
+          git clone https://code.qt.io/qt/qt5.git qt
+          cd qt
+          git checkout v${{ matrix.qt_version }} || git checkout v${{ matrix.qt_version }}-lts-lgpl
+          perl init-repository --module-subset=essential,qtserialport
+          mkdir build
+          cd build
+          ../configure -prefix ${{ runner.temp }}/Qt${{ matrix.qt_version }}-static -release -static -static-runtime -opensource -confirm-license -no-sql-mysql -no-sql-psql -no-sql-sqlite -no-journald -qt-zlib -no-mtdev -no-gif -qt-libpng -qt-libjpeg -qt-harfbuzz -no-openssl -qt-pcre -xcb -no-glib -no-egl -no-compile-examples -no-cups -no-iconv -no-tslib -fontconfig -dbus-linked -no-xcb-xlib -no-eglfs -no-directfb -no-linuxfb -no-kms -no-opengl -nomake examples -nomake tests -skip qtwebsockets -skip qtwebchannel  -skip qtwebengine -skip qtwayland -skip qtwinextras -skip qtsvg -skip qtsensors -skip qtcanvas3d -skip qtconnectivity -skip declarative -skip multimedia -no-evdev -no-libproxy
+          make -j2
+          make install
+      - name: Install Qt6
+        if: ${{ startsWith(matrix.qt_version, '6') && steps.cache-qt-static.outputs.cache-hit != 'true' }}
+        working-directory: ${{ runner.temp }}
+        run: |
+          git clone https://code.qt.io/qt/qt5.git qt
+          cd qt
+          git checkout v${{ matrix.qt_version }} || git checkout v${{ matrix.qt_version }}-lts-lgpl
+          perl init-repository --module-subset=essential,qtserialport
+          mkdir build
+          cd build
+          ../configure -prefix ${{ runner.temp }}/Qt${{ matrix.qt_version }}-static -release -static -static-runtime -opensource -confirm-license -no-sql-mysql -no-sql-psql -no-sql-sqlite -no-journald -qt-zlib -no-mtdev -no-gif -qt-libpng -qt-libjpeg -qt-harfbuzz -no-openssl -qt-pcre -xcb -no-glib -no-egl -no-cups -no-tslib -fontconfig -dbus-linked -no-xcb-xlib -no-eglfs -no-directfb -no-linuxfb -no-kms -no-opengl -nomake tests -skip qtwebchannel -skip qtwebengine -skip qtwayland -skip qtwinextras -skip qtsvg -skip qtsensors -skip qtcanvas3d -skip qtconnectivity -skip declarative -skip multimedia -no-evdev -no-libproxy -nomake examples
+          cmake --build . --parallel 2
+          cmake --install .
+      - name: Build
+        run: |
+          ${{ runner.temp }}/Qt${{ matrix.qt_version }}-static/bin/qmake -o Makefile UwTerminalX.pro -spec linux-g++ CONFIG+=qtquickcompiler
+          make
+          strip UwTerminalX
+          curl -o codes.csv http://uwterminalx.ezurio.com/codes.csv
+          curl -o Help.pdf http://uwterminalx.ezurio.com/Help.pdf
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: UwTerminalX_v${{ env.UWTERMINALX_VERSION }}_qt${{ matrix.qt_version }}-linux_static
+          path: |
+            UwTerminalX
+            codes.csv
+            Help.pdf
+        env:
+          UWTERMINALX_VERSION: ${{ needs.get_version.outputs.version }}
+  windows_dynamic:
+    needs: get_version
+    strategy:
+      fail-fast: false
+      matrix:
+        qt_version:
+          - "5.15.2"
+          - "6.7.1"
+    runs-on: windows-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
       - name: Install Qt
         uses: jurplel/install-qt-action@v4
         with:
           version: ${{ matrix.qt_version }}
           host: windows
           arch: win64_msvc2019_64
-          modules: ${{ matrix.qt_version == '6.2.4' && 'qtserialport' || '' }}
-
+          modules: ${{ startsWith(matrix.qt_version, '6') && 'qtserialport' || '' }}
       - name: Set up Visual Studio shell
         uses: egor-tensin/vs-shell@v2
         with:
           arch: x64
-
       - name: Build
         run: |
           qmake.exe .
@@ -103,11 +154,80 @@ jobs:
           nmake.exe release
           curl -o release/help.pdf http://uwterminalx.ezurio.com/help.pdf
           curl -o release/codes.csv http://uwterminalx.ezurio.com/codes.csv
-
       - name: Upload build artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: UwTerminalX_v${{ env.UWTERMINALX_VERSION }}_qt${{ matrix.qt_version }}-windows
+          name: UwTerminalX_v${{ env.UWTERMINALX_VERSION }}_qt${{ matrix.qt_version }}-windows_dynamic
+          path: |
+            release/UwTerminalX.exe
+            release/help.pdf
+            release/codes.csv
+        env:
+          UWTERMINALX_VERSION: ${{ needs.get_version.outputs.version }}
+  windows_static:
+    needs: get_version
+    strategy:
+      fail-fast: false
+      matrix:
+        qt_version:
+          - "5.15.14-lts-lgpl"
+          - "6.7.1"
+    runs-on: windows-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Set up Visual Studio shell
+        uses: egor-tensin/vs-shell@v2
+        with:
+          arch: x64
+      - name: Cache Qt static build
+        id: cache-qt-static
+        uses: actions/cache@v4
+        env:
+          cache-name: cache-qt-${{ matrix.qt_version }}-windows-static
+        with:
+          path: ${{ runner.temp }}/Qt${{ matrix.qt_version }}-static
+          key: qt-${{ matrix.qt_version }}-windows-static
+      - name: Install Qt5
+        if: ${{ startsWith(matrix.qt_version, '5') && steps.cache-qt-static.outputs.cache-hit != 'true' }}
+        working-directory: ${{ runner.temp }}
+        shell: 'pwsh'
+        run: |
+          git clone https://code.qt.io/qt/qt5.git qt
+          cd qt
+          git checkout v${{ matrix.qt_version }}
+          perl init-repository --module-subset=essential,qtserialport
+          mkdir build
+          cd build
+          ../configure -prefix ${{ runner.temp }}/Qt${{ matrix.qt_version }}-static -release -static -static-runtime -opensource -confirm-license -no-sql-mysql -no-sql-psql -no-sql-sqlite -no-journald -qt-zlib -no-mtdev -no-gif -qt-libpng -qt-libjpeg -qt-harfbuzz -no-openssl -qt-pcre -no-glib -no-egl -no-compile-examples -no-cups -no-iconv -no-tslib -no-eglfs -no-directfb -no-linuxfb -no-kms -no-opengl -nomake examples -nomake tests -skip qtwebsockets -skip qtwebchannel  -skip qtwebengine -skip qtwayland -skip qtwinextras -skip qtsvg -skip qtsensors -skip qtcanvas3d -skip qtconnectivity -skip declarative -skip multimedia -no-evdev -no-libproxy
+          nmake.exe
+          nmake.exe install
+      - name: Install Qt6
+        if: ${{ startsWith(matrix.qt_version, '6') && steps.cache-qt-static.outputs.cache-hit != 'true' }}
+        working-directory: ${{ runner.temp }}
+        shell: 'pwsh'
+        run: |
+          git clone https://code.qt.io/qt/qt5.git qt
+          cd qt
+          git checkout v${{ matrix.qt_version }}
+          perl init-repository --module-subset=essential,qtserialport
+          mkdir build
+          cd build
+          ../configure -prefix ${{ runner.temp }}/Qt${{ matrix.qt_version }}-static -release -static -static-runtime -opensource -confirm-license -no-sql-mysql -no-sql-psql -no-sql-sqlite -no-journald -qt-zlib -no-mtdev -no-gif -qt-libpng -qt-libjpeg -qt-harfbuzz -no-openssl -qt-pcre -no-glib -no-egl -no-cups -no-tslib -dbus-linked -no-eglfs -no-directfb -no-linuxfb -no-kms -no-opengl -nomake tests -skip qtwebchannel -skip qtwebengine -skip qtwayland -skip qtwinextras -skip qtsvg -skip qtsensors -skip qtcanvas3d -skip qtconnectivity -skip declarative -skip multimedia -no-evdev -no-libproxy -nomake examples
+          cmake --build . --parallel 2
+          cmake --install .
+      - name: Build
+        run: |
+          ${{ runner.temp }}/Qt${{ matrix.qt_version }}-static/bin/qmake.exe .
+          nmake.exe clean
+          set CL=/MP
+          nmake.exe release
+          curl -o release/help.pdf http://uwterminalx.ezurio.com/help.pdf
+          curl -o release/codes.csv http://uwterminalx.ezurio.com/codes.csv
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: UwTerminalX_v${{ env.UWTERMINALX_VERSION }}_qt${{ matrix.qt_version }}-windows_static
           path: |
             release/UwTerminalX.exe
             release/help.pdf

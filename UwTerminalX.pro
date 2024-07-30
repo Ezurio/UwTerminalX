@@ -101,6 +101,7 @@ RESOURCES += \
         win32:!*g++*: LIBS += -llegacy_stdio_definitions
 
         HEADERS  += FTDI/ftd2xx.h
+        QMAKE_LFLAGS_WINDOWS += /NODEFAULTLIB:LIBCMT.LIB
     }
 }
 
