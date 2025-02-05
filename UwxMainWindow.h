@@ -121,9 +121,9 @@
 /******************************************************************************/
 // Constants
 /******************************************************************************/
-const QString OldOldServerHost                  = "uwterminalx.no-ip.org"; //Very old hostname/IP of online xcompile server which is set to be removed
-const QString OldServerHost                     = "uwterminalx.lairdtech.com"; //Old hostname/IP of online xcompile server which is set to be removed
-const QString ServerHost                        = "uwterminalx.lairdconnect.com"; //Hostname/IP of online xcompile server
+const QString OldOldServerHost                     = "uwterminalx.lairdtech.com"; //Old hostname/IP of online xcompile server which is set to be removed
+const QString OldServerHost                        = "uwterminalx.lairdconnect.com"; //Hostname/IP of online xcompile server
+const QString ServerHost                        = "uwterminalx.ezurio.com"; //Hostname/IP of online xcompile server
 //Constants for various file download functions
 const qint8 MODE_COMPILE                        = 1;
 const qint8 MODE_COMPILE_LOAD                   = 2;
@@ -180,7 +180,7 @@ const quint32 DefaultAutoTrimDBufferSize        = 0;     //(Unlisted option)
 const quint16 DefaultScrollbackBufferSize       = 32;    //(Unlisted option)
 const bool DefaultSaveSize                      = false;
 //Constants for URLs
-const QString URLLinuxNonRootSetup = "https://github.com/LairdCP/UwTerminalX/wiki/Granting-non-root-USB-device-access-(Linux)";
+const QString URLLinuxNonRootSetup = "https://github.com/Ezurio/UwTerminalX/wiki/Granting-non-root-USB-device-access-(Linux)";
 //Constants for the protocol
 #ifndef UseSSL
     //HTTP

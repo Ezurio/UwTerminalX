@@ -4723,10 +4723,10 @@ MainWindow::on_btn_GitHub_clicked(
     )
 {
     //Open webpage at the UwTerminalX github page)
-    if (QDesktopServices::openUrl(QUrl("https://github.com/LairdCP/UwTerminalX")) == false)
+    if (QDesktopServices::openUrl(QUrl("https://github.com/Ezurio/UwTerminalX")) == false)
     {
         //Failed to open URL
-        QString strMessage = tr("An error occured whilst attempting to open a web browser, please ensure you have a web browser installed and configured. URL: https://github.com/LairdCP/UwTerminalX");
+        QString strMessage = tr("An error occured whilst attempting to open a web browser, please ensure you have a web browser installed and configured. URL: https://github.com/Ezurio/UwTerminalX");
         gpmErrorForm->show();
         gpmErrorForm->SetMessage(&strMessage);
     }
@@ -6365,7 +6365,7 @@ MainWindow::LookupDNSName(
 #ifndef _WIN32
 #ifndef __APPLE__
                     //Linux, show warning regarding missing DNS libraries
-                    .append("\r\n\r\nHave you installed the required additional packages? Please see https://github.com/LairdCP/UwTerminalX/wiki/Installing for further details under the Linux section.")
+                    .append("\r\n\r\nHave you installed the required additional packages? Please see https://github.com/Ezurio/UwTerminalX/wiki/Installing for further details under the Linux section.")
 #endif
 #endif
                 ;

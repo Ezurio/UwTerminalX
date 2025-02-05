@@ -6,7 +6,7 @@ UwTerminalX is a cross-platform utility for communicating and downloading applic
 
 ## Downloading
 
-Pre-compiled builds can be found by clicking the [Releases](https://github.com/LairdCP/UwTerminalX/releases) tab on Github, builds are available for Linux (32-bit and 64-bit builds, and a 32-bit ARM Raspberry Pi build), Windows (32-bit build) and Mac (64-bit build) . Please note that the SSL builds include encryption when using online functionality and should only be used in countries where encryption is legal, non-SSL builds are also available from the release page.
+Pre-compiled builds can be found by clicking the [Releases](https://github.com/Ezurio/UwTerminalX/releases) tab on Github, builds are available for Linux (32-bit and 64-bit builds, and a 32-bit ARM Raspberry Pi build), Windows (32-bit build) and Mac (64-bit build) . Please note that the SSL builds include encryption when using online functionality and should only be used in countries where encryption is legal, non-SSL builds are also available from the release page.
 
 It is recommended that you download the **SSL** build of UwTerminalX for your system as the prevents eavesdropping of the application source code when using the online service to XCompile applications.
 
@@ -32,11 +32,11 @@ Where '\~/' is the location of where you want it extracted to, '\~/' will extrac
 
 	./UwTerminalX
 
-Before running, you may need to install some additional libraries, please see https://github.com/LairdCP/UwTerminalX/wiki/Installing for further details. You may also be required to add a udev rule to grant non-root users access to USB devices, please see https://github.com/LairdCP/UwTerminalX/wiki/Granting-non-root-USB-device-access-(Linux) for details.
+Before running, you may need to install some additional libraries, please see https://github.com/Ezurio/UwTerminalX/wiki/Installing for further details. You may also be required to add a udev rule to grant non-root users access to USB devices, please see https://github.com/Ezurio/UwTerminalX/wiki/Granting-non-root-USB-device-access-(Linux) for details.
 
 ## Help and contributing
 
-There are various instructions and help pages available on the [wiki site](https://github.com/LairdCP/UwTerminalX/wiki/).
+There are various instructions and help pages available on the [wiki site](https://github.com/Ezurio/UwTerminalX/wiki/).
 
 Ezurio encourages people to branch/fork UwTerminalX to modify the code and accepts pull requests to merge these changes back into the main repository.
 
@@ -46,17 +46,17 @@ There is a mailing list available for dicussion about UwTerminalX which is avail
 
 ## Speed/Throughput testing
 
-There is a quick guide available giving an overview of the speed testing feature of UwTerminalX, https://github.com/LairdCP/UwTerminalX/wiki/Using-the-Speed-Test-feature
+There is a quick guide available giving an overview of the speed testing feature of UwTerminalX, https://github.com/Ezurio/UwTerminalX/wiki/Using-the-Speed-Test-feature
 
-## Companian Applications
+## Companion Applications
 
  * [TermNotify](https://github.com/LairdCP/TermNotify): an application that displays a popup notification when a new serial port is detected, which will open UwTerminalX if clicked.
  * [MultiDeviceLoader](https://github.com/LairdCP/MultiDeviceLoader): an application that can be used to XCompile a file and download it to multiple modules at the same time with various options including running the application or renaming it.
 
 ## Compiling
 
-For details on compiling, please refer to [the wiki](https://github.com/LairdCP/UwTerminalX/wiki/Compiling).
+For details on compiling, please refer to [the wiki](https://github.com/Ezurio/UwTerminalX/wiki/Compiling).
 
 ## License
 
-UwTerminalX is released under the [GPLv3 license](https://github.com/LairdCP/UwTerminalX/blob/master/LICENSE).
+UwTerminalX is released under the [GPLv3 license](https://github.com/Ezurio/UwTerminalX/blob/master/LICENSE).
