@@ -480,13 +480,6 @@ private slots:
     replyFinished(
         QNetworkReply* nrReply
         );
-#ifdef UseSSL
-    void
-    sslErrors(
-        QNetworkReply*,
-        QList<QSslError>
-        );
-#endif
     void
     on_check_PreXCompRun_stateChanged(
         int intChecked
@@ -948,7 +941,6 @@ private:
     QList<FileSStruct *> lstFileData; //Holds a list of filenames and line numbers for the file currently being XCompiled
 #ifdef UseSSL
     QString WebProtocol; //Holds HTTP or HTTPS depending on options selected
-    QSslCertificate *sslcEzurioSSLNew = NULL; //Holds the (newer) Ezurio SSL certificate
 #endif
     PopupMessage *gpmErrorForm; //Error message form
 #if SKIPAUTOMATIONFORM != 1

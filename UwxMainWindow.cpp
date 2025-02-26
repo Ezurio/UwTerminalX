@@ -720,19 +720,6 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     gstrResolvedServer = "";
 #endif
 
-#ifdef UseSSL
-    //Load SSL certificate
-    QFile certFile(":/certificates/UwTerminalX_new.crt");
-    if (certFile.open(QIODevice::ReadOnly))
-    {
-        //Load certificate data
-        QSslConfiguration sslcConfig;
-        sslcEzurioSSLNew = new QSslCertificate(certFile.readAll());
-        sslcConfig.addCaCertificate(*sslcEzurioSSLNew);
-        certFile.close();
-    }
-#endif
-
     //Setup the terminal scrollback buffer size
     ui->text_TermEditData->SetupScrollback(gpTermSettings->value("ScrollbackBufferSize", DefaultScrollbackBufferSize).toUInt());
 
@@ -1229,14 +1216,6 @@ MainWindow::~MainWindow()
         gpStreamFileHandle->close();
         delete gpStreamFileHandle;
     }
-
-#ifdef UseSSL
-    if (sslcEzurioSSLNew != NULL)
-    {
-        //Clear up (newer) SSL certificate
-        delete sslcEzurioSSLNew;
-    }
-#endif
 
     if (gnmManager != 0)
     {
@@ -5694,24 +5673,6 @@ MainWindow::replyFinished(
 
 //=============================================================================
 //=============================================================================
-#ifdef UseSSL
-void
-MainWindow::sslErrors(
-    QNetworkReply* nrReply,
-    QList<QSslError> lstSSLErrors
-    )
-{
-    //Error detected with SSL
-    if (sslcEzurioSSLNew != NULL && nrReply->sslConfiguration().peerCertificate() == *sslcEzurioSSLNew)
-    {
-        //Server certificate matches
-        nrReply->ignoreSslErrors(lstSSLErrors);
-    }
-}
-#endif
-
-//=============================================================================
-//=============================================================================
 void
 MainWindow::on_check_OnlineXComp_stateChanged(
     int
@@ -6350,9 +6311,6 @@ MainWindow::LookupDNSName(
                 //Setup QNetwork object
                 gnmManager = new QNetworkAccessManager();
                 connect(gnmManager, SIGNAL(finished(QNetworkReply*)), this, SLOT(replyFinished(QNetworkReply*)));
-#ifdef UseSSL
-                connect(gnmManager, SIGNAL(sslErrors(QNetworkReply*, QList<QSslError>)), this, SLOT(sslErrors(QNetworkReply*, QList<QSslError>)));
-#endif
             }
         }
         else
@@ -6383,9 +6341,6 @@ MainWindow::LookupDNSName(
         //Setup QNetwork object
         gnmManager = new QNetworkAccessManager();
         connect(gnmManager, SIGNAL(finished(QNetworkReply*)), this, SLOT(replyFinished(QNetworkReply*)));
-#ifdef UseSSL
-        connect(gnmManager, SIGNAL(sslErrors(QNetworkReply*, QList<QSslError>)), this, SLOT(sslErrors(QNetworkReply*, QList<QSslError>)));
-#endif
     }
 #endif
     return true;
