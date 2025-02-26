@@ -1763,7 +1763,9 @@ MainWindow::SerialRead(
                             //Check if online XCompiler supports this device
                             if (LookupDNSName(true) == true)
                             {
-                                gnmrReply = gnmManager->get(QNetworkRequest(QUrl(QString(WebProtocol).append("://").append(WEB_HOST_NAME).append("/supported.php?JSON=1&Dev=").append(strDevName).append("&HashA=").append(remTempREM.captured(2)).append("&HashB=").append(remTempREM.captured(3)))));
+                                QNetworkRequest request(QUrl(QString(WebProtocol).append("://").append(WEB_HOST_NAME).append("/supported.php?JSON=1&Dev=").append(strDevName).append("&HashA=").append(remTempREM.captured(2)).append("&HashB=").append(remTempREM.captured(3))));
+                                request.setAttribute(QNetworkRequest::RedirectPolicyAttribute, QNetworkRequest::NoLessSafeRedirectPolicy);
+                                gnmrReply = gnmManager->get(request);
                             }
                         }
                         else
@@ -1830,7 +1832,9 @@ MainWindow::SerialRead(
                             //XCompiler not found, try Online XCompiler
                             if (LookupDNSName(true) == true)
                             {
-                                gnmrReply = gnmManager->get(QNetworkRequest(QUrl(QString(WebProtocol).append("://").append(WEB_HOST_NAME).append("/supported.php?JSON=1&Dev=").append(strDevName).append("&HashA=").append(remTempREM.captured(2)).append("&HashB=").append(remTempREM.captured(3)))));
+                                QNetworkRequest request(QUrl(QString(WebProtocol).append("://").append(WEB_HOST_NAME).append("/supported.php?JSON=1&Dev=").append(strDevName).append("&HashA=").append(remTempREM.captured(2)).append("&HashB=").append(remTempREM.captured(3))));
+                                request.setAttribute(QNetworkRequest::RedirectPolicyAttribute, QNetworkRequest::NoLessSafeRedirectPolicy);
+                                gnmrReply = gnmManager->get(request);
                                 ui->statusBar->showMessage("Device support request sent...", 2000);
 
                                 if (gchTermMode == MODE_COMPILE)
@@ -5009,6 +5013,7 @@ MainWindow::replyFinished(
                             baPostData.append("\r\n-----------------------------17192614014659--\r\n");
                             nrThisReq.setRawHeader("Content-Type", "multipart/form-data; boundary=---------------------------17192614014659");
                             nrThisReq.setRawHeader("Content-Length", QString::number(baPostData.length()).toUtf8());
+                            nrThisReq.setAttribute(QNetworkRequest::RedirectPolicyAttribute, QNetworkRequest::NoLessSafeRedirectPolicy);
                             gnmrReply = gnmManager->post(nrThisReq, baPostData);
                             ui->statusBar->showMessage("Sending smartBASIC application for online compilation...", 500);
                         }
@@ -5772,7 +5777,9 @@ MainWindow::on_btn_ErrorCodeDownload_clicked(
             ui->btn_UwTerminalXUpdate->setEnabled(false);
             ui->btn_ModuleFirmware->setEnabled(false);
             ui->btn_OnlineXComp_Supported->setEnabled(false);
-            gnmrReply = gnmManager->get(QNetworkRequest(QUrl(QString(WebProtocol).append("://").append(WEB_HOST_NAME).append("/codes.csv"))));
+            QNetworkRequest request(QUrl(QString(WebProtocol).append("://").append(WEB_HOST_NAME).append("/codes.csv")));
+            request.setAttribute(QNetworkRequest::RedirectPolicyAttribute, QNetworkRequest::NoLessSafeRedirectPolicy);
+            gnmrReply = gnmManager->get(request);
             ui->statusBar->showMessage("Downloading Error Code file...");
         }
     }
@@ -6001,7 +6008,9 @@ MainWindow::on_btn_ModuleFirmware_clicked(
             ui->btn_UwTerminalXUpdate->setEnabled(false);
             ui->btn_ModuleFirmware->setEnabled(false);
             ui->btn_OnlineXComp_Supported->setEnabled(false);
-            gnmrReply = gnmManager->get(QNetworkRequest(QUrl(QString(WebProtocol).append("://").append(WEB_HOST_NAME).append("/firmwares.php"))));
+            QNetworkRequest request(QUrl(QString(WebProtocol).append("://").append(WEB_HOST_NAME).append("/firmwares.php")));
+            request.setAttribute(QNetworkRequest::RedirectPolicyAttribute, QNetworkRequest::NoLessSafeRedirectPolicy);
+            gnmrReply = gnmManager->get(request);
             ui->statusBar->showMessage("Checking for latest firmware versions...");
         }
     }
@@ -6257,7 +6266,9 @@ MainWindow::on_btn_OnlineXComp_Supported_clicked(
             ui->btn_UwTerminalXUpdate->setEnabled(false);
             ui->btn_ModuleFirmware->setEnabled(false);
             ui->btn_OnlineXComp_Supported->setEnabled(false);
-            gnmrReply = gnmManager->get(QNetworkRequest(QUrl(QString(WebProtocol).append("://").append(WEB_HOST_NAME).append("/compiler_list.php"))));
+            QNetworkRequest request(QUrl(QString(WebProtocol).append("://").append(WEB_HOST_NAME).append("/compiler_list.php")));
+            request.setAttribute(QNetworkRequest::RedirectPolicyAttribute, QNetworkRequest::NoLessSafeRedirectPolicy);
+            gnmrReply = gnmManager->get(request);
             ui->statusBar->showMessage("Checking for supported XCompilers...");
         }
     }
@@ -8642,7 +8653,7 @@ MainWindow::UwTerminalXUpdateCheck(
         ui->btn_UwTerminalXUpdate->setEnabled(false);
         ui->btn_ModuleFirmware->setEnabled(false);
         ui->btn_OnlineXComp_Supported->setEnabled(false);
-        gnmrReply = gnmManager->get(QNetworkRequest(QUrl(QString(WebProtocol).append("://").append(WEB_HOST_NAME).append("/update_uwterminalx.php?Ver=").append(UwVersion).append("&OS=").append(
+        QNetworkRequest request(QUrl(QString(WebProtocol).append("://").append(WEB_HOST_NAME).append("/update_uwterminalx.php?Ver=").append(UwVersion).append("&OS=").append(
 #ifdef _WIN32
     //Windows
     #ifdef _WIN64
@@ -8675,7 +8686,9 @@ MainWindow::UwTerminalXUpdateCheck(
         "LxOth"
     #endif
 #endif
-        ))));
+        )));
+        request.setAttribute(QNetworkRequest::RedirectPolicyAttribute, QNetworkRequest::NoLessSafeRedirectPolicy);
+        gnmrReply = gnmManager->get(request);
         ui->statusBar->showMessage("Checking for UwTerminalX updates...");
     }
 }
@@ -8699,7 +8712,9 @@ MainWindow::ErrorCodeUpdateCheck(
         ui->btn_UwTerminalXUpdate->setEnabled(false);
         ui->btn_ModuleFirmware->setEnabled(false);
         ui->btn_OnlineXComp_Supported->setEnabled(false);
-        gnmrReply = gnmManager->get(QNetworkRequest(QUrl(QString(WebProtocol).append("://").append(WEB_HOST_NAME).append("/update_errorcodes.php?Ver=").append(gpErrorMessages->value("Version", "0.00").toString()))));
+        QNetworkRequest request(QUrl(QString(WebProtocol).append("://").append(WEB_HOST_NAME).append("/update_errorcodes.php?Ver=").append(gpErrorMessages->value("Version", "0.00").toString())));
+        request.setAttribute(QNetworkRequest::RedirectPolicyAttribute, QNetworkRequest::NoLessSafeRedirectPolicy);
+        gnmrReply = gnmManager->get(request);
         ui->statusBar->showMessage("Checking for Error Code file updates...");
     }
 }
