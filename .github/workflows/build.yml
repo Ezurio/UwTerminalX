@@ -22,7 +22,7 @@ jobs:
       matrix:
         qt_version:
           - "5.15.2"
-          - "6.7.1"
+          - "6.8.2"
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -61,17 +61,26 @@ jobs:
       fail-fast: false
       matrix:
         qt_version:
-          - "5.15.14"
+          - "5.15.16"
           - "6.7.1"
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     steps:
       - name: Checkout
         uses: actions/checkout@v4
       - name: Install dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install -y libftdi1-dev libusb-1.0-0-dev libudev-dev libssl-dev libgl1-mesa-dev libfontconfig1-dev libfreetype6-dev libx11-dev libx11-xcb-dev libxext-dev libxfixes-dev libxi-dev libxrender-dev libxcb1-dev libxcb-glx0-dev libxcb-keysyms1-dev libxcb-image0-dev libxcb-shm0-dev libxcb-icccm4-dev libxcb-sync-dev libxcb-xfixes0-dev libxcb-shape0-dev libxcb-randr0-dev libxcb-render-util0-dev libxcb-util-dev libxcb-xinerama0-dev libxcb-xkb-dev libxkbcommon-dev libxkbcommon-x11-dev libatspi2.0-dev dbus-x11 libpcre2-dev libclang-dev '^libxcb.*-dev' libx11-xcb-dev libglu1-mesa-dev libxrender-dev libxi-dev libxkbcommon-dev libxkbcommon-x11-dev
+          sudo apt-get install -y libftdi1-dev libusb-1.0-0-dev libudev-dev libssl-dev libgl1-mesa-dev libfontconfig1-dev libfreetype6-dev libx11-dev libx11-xcb-dev libxext-dev libxfixes-dev libxi-dev libxrender-dev libxcb1-dev libxcb-glx0-dev libxcb-keysyms1-dev libxcb-image0-dev libxcb-shm0-dev libxcb-icccm4-dev libxcb-sync-dev libxcb-xfixes0-dev libxcb-shape0-dev libxcb-randr0-dev libxcb-render-util0-dev libxcb-util-dev libxcb-xinerama0-dev libxcb-xkb-dev libxkbcommon-dev libxkbcommon-x11-dev libatspi2.0-dev dbus-x11 libpcre2-dev libclang-dev '^libxcb.*-dev' libx11-xcb-dev libglu1-mesa-dev libxrender-dev libxi-dev libxkbcommon-dev libxkbcommon-x11-dev ninja-build
         shell: bash
+      - name: Free disk space
+        uses: jlumbroso/free-disk-space@v1.3.1
+        with:
+          android: true
+          dotnet: true
+          haskell: true
+          large-packages: false # This removes llvm packages, which we need
+          docker-images: true
+          swap-storage: false # Don't remove swap storage
       - name: Cache Qt static build
         id: cache-qt-static
         uses: actions/cache@v4
@@ -79,7 +88,9 @@ jobs:
           cache-name: cache-qt-${{ matrix.qt_version }}-linux-static
         with:
           path: ${{ runner.temp }}/Qt${{ matrix.qt_version }}-static
-          key: qt-${{ matrix.qt_version }}-linux-static
+          key: qt-${{ matrix.qt_version }}-linux-static-${{ hashFiles('**/qt.pro') }}
+          restore-keys: |
+            qt-${{ matrix.qt_version }}-linux-static-
       - name: Install Qt5
         if: ${{ startsWith(matrix.qt_version, '5') && steps.cache-qt-static.outputs.cache-hit != 'true' }}
         working-directory: ${{ runner.temp }}
@@ -90,7 +101,7 @@ jobs:
           perl init-repository --module-subset=essential,qtserialport
           mkdir build
           cd build
-          ../configure -prefix ${{ runner.temp }}/Qt${{ matrix.qt_version }}-static -release -static -static-runtime -opensource -confirm-license -no-sql-mysql -no-sql-psql -no-sql-sqlite -no-journald -qt-zlib -no-mtdev -no-gif -qt-libpng -qt-libjpeg -qt-harfbuzz -no-openssl -qt-pcre -xcb -no-glib -no-egl -no-compile-examples -no-cups -no-iconv -no-tslib -fontconfig -dbus-linked -no-xcb-xlib -no-eglfs -no-directfb -no-linuxfb -no-kms -no-opengl -nomake examples -nomake tests -skip qtwebsockets -skip qtwebchannel  -skip qtwebengine -skip qtwayland -skip qtwinextras -skip qtsvg -skip qtsensors -skip qtcanvas3d -skip qtconnectivity -skip declarative -skip multimedia -no-evdev -no-libproxy
+          ../configure -prefix ${{ runner.temp }}/Qt${{ matrix.qt_version }}-static -release -static -static-runtime -opensource -confirm-license -no-sql-mysql -no-sql-psql -no-sql-sqlite -no-journald -qt-zlib -no-mtdev -no-gif -qt-libpng -qt-libjpeg -qt-harfbuzz -qt-pcre -xcb -no-glib -no-egl -no-compile-examples -no-cups -no-iconv -no-tslib -fontconfig -dbus-linked -no-xcb-xlib -no-eglfs -no-directfb -no-linuxfb -no-kms -no-opengl -nomake examples -nomake tests -skip qtwebsockets -skip qtwebchannel  -skip qtwebengine -skip qtwayland -skip qtwinextras -skip qtsvg -skip qtsensors -skip qtcanvas3d -skip qtconnectivity -skip declarative -skip multimedia -no-evdev -no-libproxy
           make -j2
           make install
       - name: Install Qt6
@@ -103,7 +114,7 @@ jobs:
           perl init-repository --module-subset=essential,qtserialport
           mkdir build
           cd build
-          ../configure -prefix ${{ runner.temp }}/Qt${{ matrix.qt_version }}-static -release -static -static-runtime -opensource -confirm-license -no-sql-mysql -no-sql-psql -no-sql-sqlite -no-journald -qt-zlib -no-mtdev -no-gif -qt-libpng -qt-libjpeg -qt-harfbuzz -no-openssl -qt-pcre -xcb -no-glib -no-egl -no-cups -no-tslib -fontconfig -dbus-linked -no-xcb-xlib -no-eglfs -no-directfb -no-linuxfb -no-kms -no-opengl -nomake tests -skip qtwebchannel -skip qtwebengine -skip qtwayland -skip qtwinextras -skip qtsvg -skip qtsensors -skip qtcanvas3d -skip qtconnectivity -skip declarative -skip multimedia -no-evdev -no-libproxy -nomake examples
+          ../configure -prefix ${{ runner.temp }}/Qt${{ matrix.qt_version }}-static -release -static -static-runtime -opensource -confirm-license -no-sql-mysql -no-sql-psql -no-sql-sqlite -no-journald -qt-zlib -no-mtdev -no-gif -qt-libpng -qt-libjpeg -qt-harfbuzz -qt-pcre -xcb -no-glib -no-egl -no-cups -no-tslib -fontconfig -dbus-linked -no-xcb-xlib -no-eglfs -no-directfb -no-linuxfb -no-kms -no-opengl -nomake tests -skip qtwebchannel -skip qtwebengine -skip qtwayland -skip qtwinextras -skip qtsvg -skip qtsensors -skip qtcanvas3d -skip qtconnectivity -skip declarative -skip multimedia -no-evdev -no-libproxy -nomake examples
           cmake --build . --parallel 2
           cmake --install .
       - name: Build
@@ -130,7 +141,7 @@ jobs:
       matrix:
         qt_version:
           - "5.15.2"
-          - "6.7.1"
+          - "6.8.2"
     runs-on: windows-latest
     steps:
       - name: Checkout
@@ -140,7 +151,7 @@ jobs:
         with:
           version: ${{ matrix.qt_version }}
           host: windows
-          arch: win64_msvc2019_64
+          arch: ${{ startsWith(matrix.qt_version, '6') && 'win64_msvc2022_64' || 'win64_msvc2019_64' }}
           modules: ${{ startsWith(matrix.qt_version, '6') && 'qtserialport' || '' }}
       - name: Set up Visual Studio shell
         uses: egor-tensin/vs-shell@v2
@@ -171,7 +182,7 @@ jobs:
       matrix:
         qt_version:
           - "5.15.14-lts-lgpl"
-          - "6.7.1"
+          - "6.8.2"
     runs-on: windows-latest
     steps:
       - name: Checkout
@@ -199,7 +210,7 @@ jobs:
           perl init-repository --module-subset=essential,qtserialport
           mkdir build
           cd build
-          ../configure -prefix ${{ runner.temp }}/Qt${{ matrix.qt_version }}-static -release -static -static-runtime -opensource -confirm-license -no-sql-mysql -no-sql-psql -no-sql-sqlite -no-journald -qt-zlib -no-mtdev -no-gif -qt-libpng -qt-libjpeg -qt-harfbuzz -no-openssl -qt-pcre -no-glib -no-egl -no-compile-examples -no-cups -no-iconv -no-tslib -no-eglfs -no-directfb -no-linuxfb -no-kms -no-opengl -nomake examples -nomake tests -skip qtwebsockets -skip qtwebchannel  -skip qtwebengine -skip qtwayland -skip qtwinextras -skip qtsvg -skip qtsensors -skip qtcanvas3d -skip qtconnectivity -skip declarative -skip multimedia -no-evdev -no-libproxy
+          ../configure -prefix ${{ runner.temp }}/Qt${{ matrix.qt_version }}-static -release -static -static-runtime -opensource -confirm-license -no-sql-mysql -no-sql-psql -no-sql-sqlite -no-journald -qt-zlib -no-mtdev -no-gif -qt-libpng -qt-libjpeg -qt-harfbuzz -qt-pcre -no-glib -no-egl -no-compile-examples -no-cups -no-iconv -no-tslib -no-eglfs -no-directfb -no-linuxfb -no-kms -no-opengl -nomake examples -nomake tests -skip qtwebsockets -skip qtwebchannel  -skip qtwebengine -skip qtwayland -skip qtwinextras -skip qtsvg -skip qtsensors -skip qtcanvas3d -skip qtconnectivity -skip declarative -skip multimedia -no-evdev -no-libproxy -schannel
           nmake.exe
           nmake.exe install
       - name: Install Qt6
@@ -210,10 +221,10 @@ jobs:
           git clone https://code.qt.io/qt/qt5.git qt
           cd qt
           git checkout v${{ matrix.qt_version }}
-          perl init-repository --module-subset=essential,qtserialport
+          perl init-repository.pl --module-subset=essential,qtserialport
           mkdir build
           cd build
-          ../configure -prefix ${{ runner.temp }}/Qt${{ matrix.qt_version }}-static -release -static -static-runtime -opensource -confirm-license -no-sql-mysql -no-sql-psql -no-sql-sqlite -no-journald -qt-zlib -no-mtdev -no-gif -qt-libpng -qt-libjpeg -qt-harfbuzz -no-openssl -qt-pcre -no-glib -no-egl -no-cups -no-tslib -dbus-linked -no-eglfs -no-directfb -no-linuxfb -no-kms -no-opengl -nomake tests -skip qtwebchannel -skip qtwebengine -skip qtwayland -skip qtwinextras -skip qtsvg -skip qtsensors -skip qtcanvas3d -skip qtconnectivity -skip declarative -skip multimedia -no-evdev -no-libproxy -nomake examples
+          ../configure -prefix ${{ runner.temp }}/Qt${{ matrix.qt_version }}-static -release -static -static-runtime -opensource -confirm-license -no-sql-mysql -no-sql-psql -no-sql-sqlite -no-journald -qt-zlib -no-mtdev -no-gif -qt-libpng -qt-libjpeg -qt-harfbuzz -qt-pcre -no-glib -no-egl -no-cups -no-tslib -dbus-linked -no-eglfs -no-directfb -no-linuxfb -no-kms -no-opengl -nomake tests -skip qtwebchannel -skip qtwebengine -skip qtwayland -skip qtwinextras -skip qtsvg -skip qtsensors -skip qtcanvas3d -skip qtconnectivity -skip declarative -skip multimedia -no-evdev -no-libproxy -nomake examples
           cmake --build . --parallel 2
           cmake --install .
       - name: Build
