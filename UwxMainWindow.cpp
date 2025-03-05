@@ -284,13 +284,6 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     gimUw32Image = QImage(":/images/UwTerminal32.png");
 #endif
 
-#ifndef UseSSL
-    //Disable SSL checkbox for non-SSL builds
-    ui->check_EnableSSL->setCheckable(false);
-    ui->check_EnableSSL->setChecked(false);
-    ui->check_EnableSSL->setEnabled(false);
-#endif
-
     //Create pixmaps
     gpEmptyCirclePixmap = new QPixmap(QPixmap::fromImage(gimEmptyCircleImage));
     gpRedCirclePixmap = new QPixmap(QPixmap::fromImage(gimRedCircleImage));
@@ -339,17 +332,12 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     connect(&gtmrSpeedTestStats10s, SIGNAL(timeout()), this, SLOT(OutputSpeedTestStats()));
 #endif
     //Display version
-    ui->statusBar->showMessage(QString("UwTerminalX")
-#ifdef UseSSL
-    .append("-SSL")
-#endif
+    ui->statusBar->showMessage(QString("UwTerminalX-SSL")
     .append(" version ").append(UwVersion).append(" (").append(OS).append("), Built ").append(__DATE__).append(" Using QT ").append(QT_VERSION_STR)
-#ifdef UseSSL
 #ifdef TARGET_OS_MAC
     .append(", ").append(QString(QSslSocket::sslLibraryBuildVersionString()).replace(",", ":"))
 #else
     .append(", ").append(QString(QSslSocket::sslLibraryBuildVersionString()).left(QSslSocket::sslLibraryBuildVersionString().indexOf(" ", 9)))
-#endif
 #endif
 #ifdef QT_DEBUG
     .append(" [DEBUG BUILD]")
@@ -482,21 +470,6 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
 
     //Set license checking option
     ui->check_CheckLicense->setChecked(gpTermSettings->value("LicenseCheck", DefaultLicenceCheckMode).toBool());
-
-#ifdef UseSSL
-    //Set SSL status
-    ui->check_EnableSSL->setChecked(gpTermSettings->value("SSLEnable", DefaultSSLEnable).toBool());
-    if (ui->check_EnableSSL->isChecked() == true)
-    {
-        //HTTPS
-        WebProtocol = "https";
-    }
-    else
-    {
-        //HTTP
-        WebProtocol = "http";
-    }
-#endif
 
     //Set showing filesize option
     ui->check_ShowFileSize->setChecked(gpTermSettings->value("ShowFileSize", DefaultShowFileSize).toBool());
@@ -1763,7 +1736,7 @@ MainWindow::SerialRead(
                             //Check if online XCompiler supports this device
                             if (LookupDNSName(true) == true)
                             {
-                                QNetworkRequest request(QUrl(QString(WebProtocol).append("://").append(WEB_HOST_NAME).append("/supported.php?JSON=1&Dev=").append(strDevName).append("&HashA=").append(remTempREM.captured(2)).append("&HashB=").append(remTempREM.captured(3))));
+                                QNetworkRequest request(QUrl(QString("https://").append(WEB_HOST_NAME).append("/supported.php?JSON=1&Dev=").append(strDevName).append("&HashA=").append(remTempREM.captured(2)).append("&HashB=").append(remTempREM.captured(3))));
                                 request.setAttribute(QNetworkRequest::RedirectPolicyAttribute, QNetworkRequest::NoLessSafeRedirectPolicy);
                                 gnmrReply = gnmManager->get(request);
                             }
@@ -1832,7 +1805,7 @@ MainWindow::SerialRead(
                             //XCompiler not found, try Online XCompiler
                             if (LookupDNSName(true) == true)
                             {
-                                QNetworkRequest request(QUrl(QString(WebProtocol).append("://").append(WEB_HOST_NAME).append("/supported.php?JSON=1&Dev=").append(strDevName).append("&HashA=").append(remTempREM.captured(2)).append("&HashB=").append(remTempREM.captured(3))));
+                                QNetworkRequest request(QUrl(QString("https://").append(WEB_HOST_NAME).append("/supported.php?JSON=1&Dev=").append(strDevName).append("&HashA=").append(remTempREM.captured(2)).append("&HashB=").append(remTempREM.captured(3))));
                                 request.setAttribute(QNetworkRequest::RedirectPolicyAttribute, QNetworkRequest::NoLessSafeRedirectPolicy);
                                 gnmrReply = gnmManager->get(request);
                                 ui->statusBar->showMessage("Device support request sent...", 2000);
@@ -4794,7 +4767,7 @@ MainWindow::replyFinished(
                         {
                             //Setup the request and add the original application filename
                             QFileInfo fiFileInfo(gstrTermFilename);
-                            QNetworkRequest nrThisReq(QUrl(QString(WebProtocol).append("://").append(WEB_HOST_NAME).append("/xcompile.php?JSON=1").append((ui->check_EnableModuleFirmwareCheck->isChecked() == true ? "&LatestFW=1" : ""))));
+                            QNetworkRequest nrThisReq(QUrl(QString("https://").append(WEB_HOST_NAME).append("/xcompile.php?JSON=1").append((ui->check_EnableModuleFirmwareCheck->isChecked() == true ? "&LatestFW=1" : ""))));
                             QByteArray baPostData;
                             baPostData.append("-----------------------------17192614014659\r\nContent-Disposition: form-data; name=\"file_XComp\"\r\n\r\n").append(joJsonObject["ID"].toString().toUtf8()).append("\r\n");
                             baPostData.append(QString("-----------------------------17192614014659\r\nContent-Disposition: form-data; name=\"file_sB\"; filename=\"").append(fiFileInfo.fileName().replace("\"", "")).append("\"\r\nContent-Type: application/octet-stream\r\n\r\n").toUtf8());
@@ -5777,7 +5750,7 @@ MainWindow::on_btn_ErrorCodeDownload_clicked(
             ui->btn_UwTerminalXUpdate->setEnabled(false);
             ui->btn_ModuleFirmware->setEnabled(false);
             ui->btn_OnlineXComp_Supported->setEnabled(false);
-            QNetworkRequest request(QUrl(QString(WebProtocol).append("://").append(WEB_HOST_NAME).append("/codes.csv")));
+            QNetworkRequest request(QUrl(QString("https://").append(WEB_HOST_NAME).append("/codes.csv")));
             request.setAttribute(QNetworkRequest::RedirectPolicyAttribute, QNetworkRequest::NoLessSafeRedirectPolicy);
             gnmrReply = gnmManager->get(request);
             ui->statusBar->showMessage("Downloading Error Code file...");
@@ -6008,7 +5981,7 @@ MainWindow::on_btn_ModuleFirmware_clicked(
             ui->btn_UwTerminalXUpdate->setEnabled(false);
             ui->btn_ModuleFirmware->setEnabled(false);
             ui->btn_OnlineXComp_Supported->setEnabled(false);
-            QNetworkRequest request(QUrl(QString(WebProtocol).append("://").append(WEB_HOST_NAME).append("/firmwares.php")));
+            QNetworkRequest request(QUrl(QString("https://").append(WEB_HOST_NAME).append("/firmwares.php")));
             request.setAttribute(QNetworkRequest::RedirectPolicyAttribute, QNetworkRequest::NoLessSafeRedirectPolicy);
             gnmrReply = gnmManager->get(request);
             ui->statusBar->showMessage("Checking for latest firmware versions...");
@@ -6266,7 +6239,7 @@ MainWindow::on_btn_OnlineXComp_Supported_clicked(
             ui->btn_UwTerminalXUpdate->setEnabled(false);
             ui->btn_ModuleFirmware->setEnabled(false);
             ui->btn_OnlineXComp_Supported->setEnabled(false);
-            QNetworkRequest request(QUrl(QString(WebProtocol).append("://").append(WEB_HOST_NAME).append("/compiler_list.php")));
+            QNetworkRequest request(QUrl(QString("https://").append(WEB_HOST_NAME).append("/compiler_list.php")));
             request.setAttribute(QNetworkRequest::RedirectPolicyAttribute, QNetworkRequest::NoLessSafeRedirectPolicy);
             gnmrReply = gnmManager->get(request);
             ui->statusBar->showMessage("Checking for supported XCompilers...");
@@ -6787,22 +6760,6 @@ MainWindow::LoadSettings(
         {
             gpTermSettings->setValue("ScrollbackBufferSize", DefaultScrollbackBufferSize); //The number of lines in the terminal scrollback buffer
         }
-#ifdef UseSSL
-        if (gpTermSettings->value("SSLEnable").isNull())
-        {
-            gpTermSettings->setValue("SSLEnable", DefaultSSLEnable); //If SSL should be used for online functionality or not (1 = use SSL, 0 = use HTTP)
-            if (DefaultSSLEnable == true)
-            {
-                //HTTPS
-                WebProtocol = "https";
-            }
-            else
-            {
-                //HTTP
-                WebProtocol = "http";
-            }
-        }
-#endif
         if (gpTermSettings->value("ShowFileSize").isNull())
         {
             gpTermSettings->setValue("ShowFileSize", DefaultShowFileSize); //If the size of applications and files should be shown or not
@@ -7173,29 +7130,6 @@ MainWindow::on_btn_ReloadLog_clicked(
     //Reload log
     on_combo_LogFile_currentIndexChanged(ui->combo_LogFile->currentIndex());
 }
-
-//=============================================================================
-//=============================================================================
-#ifdef UseSSL
-void
-MainWindow::on_check_EnableSSL_stateChanged(
-    int
-    )
-{
-    //Update SSL preference
-    gpTermSettings->setValue("SSLEnable", ui->check_EnableSSL->isChecked());
-    if (ui->check_EnableSSL->isChecked() == true)
-    {
-        //HTTPS
-        WebProtocol = "https";
-    }
-    else
-    {
-        //HTTP
-        WebProtocol = "http";
-    }
-}
-#endif
 
 //=============================================================================
 //=============================================================================
@@ -8653,7 +8587,7 @@ MainWindow::UwTerminalXUpdateCheck(
         ui->btn_UwTerminalXUpdate->setEnabled(false);
         ui->btn_ModuleFirmware->setEnabled(false);
         ui->btn_OnlineXComp_Supported->setEnabled(false);
-        QNetworkRequest request(QUrl(QString(WebProtocol).append("://").append(WEB_HOST_NAME).append("/update_uwterminalx.php?Ver=").append(UwVersion).append("&OS=").append(
+        QNetworkRequest request(QUrl(QString("https://").append(WEB_HOST_NAME).append("/update_uwterminalx.php?Ver=").append(UwVersion).append("&OS=").append(
 #ifdef _WIN32
     //Windows
     #ifdef _WIN64
@@ -8712,7 +8646,7 @@ MainWindow::ErrorCodeUpdateCheck(
         ui->btn_UwTerminalXUpdate->setEnabled(false);
         ui->btn_ModuleFirmware->setEnabled(false);
         ui->btn_OnlineXComp_Supported->setEnabled(false);
-        QNetworkRequest request(QUrl(QString(WebProtocol).append("://").append(WEB_HOST_NAME).append("/update_errorcodes.php?Ver=").append(gpErrorMessages->value("Version", "0.00").toString())));
+        QNetworkRequest request(QUrl(QString("https://").append(WEB_HOST_NAME).append("/update_errorcodes.php?Ver=").append(gpErrorMessages->value("Version", "0.00").toString())));
         request.setAttribute(QNetworkRequest::RedirectPolicyAttribute, QNetworkRequest::NoLessSafeRedirectPolicy);
         gnmrReply = gnmManager->get(request);
         ui->statusBar->showMessage("Checking for Error Code file updates...");

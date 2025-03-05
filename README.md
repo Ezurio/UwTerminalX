@@ -6,9 +6,7 @@ UwTerminalX is a cross-platform utility for communicating and downloading applic
 
 ## Downloading
 
-Pre-compiled builds can be found by clicking the [Releases](https://github.com/Ezurio/UwTerminalX/releases) tab on Github, builds are available for Linux (32-bit and 64-bit builds, and a 32-bit ARM Raspberry Pi build), Windows (32-bit build) and Mac (64-bit build) . Please note that the SSL builds include encryption when using online functionality and should only be used in countries where encryption is legal, non-SSL builds are also available from the release page.
-
-It is recommended that you download the **SSL** build of UwTerminalX for your system as the prevents eavesdropping of the application source code when using the online service to XCompile applications.
+Pre-compiled builds can be found by clicking the [Releases](https://github.com/Ezurio/UwTerminalX/releases) tab on Github, builds are available for Linux (32-bit and 64-bit builds, and a 32-bit ARM Raspberry Pi build), Windows (32-bit build) and Mac (64-bit build).
 
 ## Setup
 
@@ -16,11 +14,11 @@ It is recommended that you download the **SSL** build of UwTerminalX for your sy
 
 Download and open the zip file, extract the files to a folder on your computer and double click 'UwTerminalX.exe' to run UwTerminalX.
 
-If using the SSL version of UwTerminalX, then the Visual Studio 2015 runtime files are required which are available on the [Microsoft site](https://www.microsoft.com/en-gb/download/details.aspx?id=48145).
+The Visual Studio 2015 runtime files are required which are available on the [Microsoft site](https://www.microsoft.com/en-gb/download/details.aspx?id=48145).
 
 ### Mac:
 
-(**Mac OS X version 10.10 or later is required if using the pre-compiled binaries, as Secure Transport is built into OS X there is no non-SSL build available for OS X systems**): Download and open the dmg file, open it to mount it as a drive on your computer, go to the disk drive and copy the file UwTerminalX to folder on your computer. You can run UwTerminalX by double clicking the icon - if you are greeted with a warning that the executable is untrusted then you can run it by right clicking it and selecting the 'run' option. If this does not work then you may need to view the executable security settings on your mac.
+(**Mac OS X version 10.10 or later is required if using the pre-compiled binaries for OS X systems**): Download and open the dmg file, open it to mount it as a drive on your computer, go to the disk drive and copy the file UwTerminalX to folder on your computer. You can run UwTerminalX by double clicking the icon - if you are greeted with a warning that the executable is untrusted then you can run it by right clicking it and selecting the 'run' option. If this does not work then you may need to view the executable security settings on your mac.
 
 ### Linux (Including Raspberry Pi):
 

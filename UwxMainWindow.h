@@ -98,12 +98,7 @@
 /******************************************************************************/
 // Defines
 /******************************************************************************/
-#ifndef QT_NO_SSL
-    #define UseSSL //By default enable SSL if Qt supports it (requires OpenSSL runtime libraries). Comment this line out to build without SSL support or if you get errors when communicating with the server
-#endif
-#ifdef UseSSL
-    #include <QSslSocket>
-#endif
+#include <QSslSocket>
 
 //Decides if generic data types will be 32 or 64-bit
 #if _WIN64 || __aarch64__ || TARGET_OS_MAC || __x86_64__
@@ -181,11 +176,6 @@ const quint16 DefaultScrollbackBufferSize       = 32;    //(Unlisted option)
 const bool DefaultSaveSize                      = false;
 //Constants for URLs
 const QString URLLinuxNonRootSetup = "https://github.com/Ezurio/UwTerminalX/wiki/Granting-non-root-USB-device-access-(Linux)";
-//Constants for the protocol
-#ifndef UseSSL
-    //HTTP
-    const QString WebProtocol                   = "http";
-#endif
 const qint8 FilenameIndexApplication            = 0;
 const qint8 FilenameIndexScripting              = 1;
 const qint8 FilenameIndexOthers                 = 2;
@@ -632,12 +622,6 @@ private slots:
     void
     on_btn_ReloadLog_clicked(
         );
-#ifdef UseSSL
-    void
-    on_check_EnableSSL_stateChanged(
-        int
-        );
-#endif
     void
     on_check_ShowFileSize_stateChanged(
         int
@@ -939,9 +923,6 @@ private:
     QTimer gtmrBaudTimer; //Timer for automatic baud rate detection timeout
     bool gbAutoBaud; //True if automatic baud rate detection is in progress
     QList<FileSStruct *> lstFileData; //Holds a list of filenames and line numbers for the file currently being XCompiled
-#ifdef UseSSL
-    QString WebProtocol; //Holds HTTP or HTTPS depending on options selected
-#endif
     PopupMessage *gpmErrorForm; //Error message form
 #if SKIPAUTOMATIONFORM != 1
     UwxAutomation *guaAutomationForm; //Automation form

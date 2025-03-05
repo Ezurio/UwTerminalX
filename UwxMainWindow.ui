@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>718</width>
+    <width>808</width>
     <height>470</height>
    </rect>
   </property>
@@ -83,7 +83,7 @@
          </size>
         </property>
         <property name="currentIndex">
-         <number>4</number>
+         <number>1</number>
         </property>
         <property name="elideMode">
          <enum>Qt::ElideNone</enum>
@@ -1762,19 +1762,6 @@
                  </property>
                  <property name="text">
                   <string>Shift+enter line seperator</string>
-                 </property>
-                </widget>
-               </item>
-               <item>
-                <widget class="QCheckBox" name="check_EnableSSL">
-                 <property name="toolTip">
-                  <string>Enable this to use HTTPS (SSL) when communicating with UwTerminalX server (when updating or compiling applications), otherwise uses plaintext HTTP.</string>
-                 </property>
-                 <property name="text">
-                  <string>Enable SSL</string>
-                 </property>
-                 <property name="checked">
-                  <bool>true</bool>
                  </property>
                 </widget>
                </item>
@@ -3693,8 +3680,8 @@ You can also use the button below to check if there is a newer version of UwTerm
                         <rect>
                          <x>0</x>
                          <y>0</y>
-                         <width>204</width>
-                         <height>92</height>
+                         <width>200</width>
+                         <height>68</height>
                         </rect>
                        </property>
                        <property name="sizePolicy">
