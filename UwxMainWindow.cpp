@@ -332,7 +332,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     connect(&gtmrSpeedTestStats10s, SIGNAL(timeout()), this, SLOT(OutputSpeedTestStats()));
 #endif
     //Display version
-    ui->statusBar->showMessage(QString("UwTerminalX-SSL")
+    ui->statusBar->showMessage(QString("UwTerminalX")
     .append(" version ").append(UwVersion).append(" (").append(OS).append("), Built ").append(__DATE__).append(" Using QT ").append(QT_VERSION_STR)
 #ifdef TARGET_OS_MAC
     .append(", ").append(QString(QSslSocket::sslLibraryBuildVersionString()).replace(",", ":"))
