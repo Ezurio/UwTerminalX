@@ -245,3 +245,105 @@ jobs:
             release/codes.csv
         env:
           UWTERMINALX_VERSION: ${{ needs.get_version.outputs.version }}
+  macos_dynamic:
+    needs: get_version
+    strategy:
+      fail-fast: false
+      matrix:
+        qt_version:
+          - "5.15.2"
+          - "6.8.2"
+    runs-on: macos-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Install Qt
+        uses: jurplel/install-qt-action@v4
+        with:
+          version: ${{ matrix.qt_version }}
+          host: mac
+          arch: clang_64
+          modules: ${{ startsWith(matrix.qt_version, '6') && 'qtserialport' || '' }}
+      - name: Build
+        run: |
+          qmake -o Makefile UwTerminalX.pro CONFIG+=qtquickcompiler
+          make
+          curl -o codes.csv http://uwterminalx.ezurio.com/codes.csv
+          curl -o Help.pdf http://uwterminalx.ezurio.com/Help.pdf
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: UwTerminalX_v${{ env.UWTERMINALX_VERSION }}_qt${{ matrix.qt_version }}-macos_dynamic
+          path: |
+            UwTerminalX.app
+            codes.csv
+            Help.pdf
+        env:
+          UWTERMINALX_VERSION: ${{ needs.get_version.outputs.version }}
+  macos_static:
+    needs: get_version
+    strategy:
+      fail-fast: false
+      matrix:
+        qt_version:
+          - "5.15.16"
+          - "6.7.1"
+    runs-on: macos-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Install dependencies
+        run: |
+          brew install ninja
+      - name: Cache Qt static build
+        id: cache-qt-static
+        uses: actions/cache@v4
+        env:
+          cache-name: cache-qt-${{ matrix.qt_version }}-macos-static
+        with:
+          path: ${{ runner.temp }}/Qt${{ matrix.qt_version }}-static
+          key: qt-${{ matrix.qt_version }}-macos-static-${{ hashFiles('**/qt.pro') }}
+          restore-keys: |
+            qt-${{ matrix.qt_version }}-macos-static-
+      - name: Install Qt5
+        if: ${{ startsWith(matrix.qt_version, '5') && steps.cache-qt-static.outputs.cache-hit != 'true' }}
+        working-directory: ${{ runner.temp }}
+        run: |
+          git clone https://code.qt.io/qt/qt5.git qt
+          cd qt
+          git checkout v${{ matrix.qt_version }} || git checkout v${{ matrix.qt_version }}-lts-lgpl
+          perl init-repository --module-subset=essential,qtserialport
+          mkdir build
+          cd build
+          ../configure -prefix ${{ runner.temp }}/Qt${{ matrix.qt_version }}-static -release -static -static-runtime -opensource -confirm-license -no-sql-mysql -no-sql-psql -no-sql-sqlite -no-journald -qt-zlib -no-mtdev -no-gif -qt-libpng -qt-libjpeg -qt-harfbuzz -qt-pcre -no-glib -no-egl -no-compile-examples -no-cups -no-iconv -no-tslib -no-eglfs -no-directfb -no-linuxfb -no-kms -no-opengl -nomake examples -nomake tests -skip qtwebsockets -skip qtwebchannel  -skip qtwebengine -skip qtwayland -skip qtwinextras -skip qtsvg -skip qtsensors -skip qtcanvas3d -skip qtconnectivity -skip declarative -skip multimedia -no-evdev -no-libproxy
+          make
+          sudo make -j1 install
+      - name: Install Qt6
+        if: ${{ startsWith(matrix.qt_version, '6') && steps.cache-qt-static.outputs.cache-hit != 'true' }}
+        working-directory: ${{ runner.temp }}
+        run: |
+          git clone https://code.qt.io/qt/qt5.git qt
+          cd qt
+          git checkout v${{ matrix.qt_version }} || git checkout v${{ matrix.qt_version }}-lts-lgpl
+          perl init-repository --module-subset=essential,qtserialport
+          mkdir build
+          cd build
+          ../configure -prefix ${{ runner.temp }}/Qt${{ matrix.qt_version }}-static -release -static -static-runtime -opensource -confirm-license -no-sql-mysql -no-sql-psql -no-sql-sqlite -no-journald -qt-zlib -no-mtdev -no-gif -qt-libpng -qt-libjpeg -qt-harfbuzz -qt-pcre -no-glib -no-egl -no-cups -no-tslib -no-eglfs -no-directfb -no-linuxfb -no-kms -no-opengl -nomake tests -skip qtwebchannel -skip qtwebengine -skip qtwayland -skip qtwinextras -skip qtsvg -skip qtsensors -skip qtcanvas3d -skip qtconnectivity -skip declarative -skip multimedia -no-evdev -no-libproxy -nomake examples -DCMAKE_OSX_ARCHITECTURES="x86_64;arm64"
+          cmake --build . --parallel
+          cmake --install .
+      - name: Build
+        run: |
+          ${{ runner.temp }}/Qt${{ matrix.qt_version }}-static/bin/qmake -o Makefile UwTerminalX.pro CONFIG+=qtquickcompiler
+          make
+          curl -o codes.csv http://uwterminalx.ezurio.com/codes.csv
+          curl -o Help.pdf http://uwterminalx.ezurio.com/Help.pdf
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: UwTerminalX_v${{ env.UWTERMINALX_VERSION }}_qt${{ matrix.qt_version }}-macos_static
+          path: |
+            UwTerminalX.app
+            codes.csv
+            Help.pdf
+        env:
+          UWTERMINALX_VERSION: ${{ needs.get_version.outputs.version }}
