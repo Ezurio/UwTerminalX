@@ -4944,6 +4944,7 @@ MainWindow::replyFinished(
                                     {
                                         tmpData2.append(file.readAll());
                                     }
+                                    tmpData2.append('\n');
                                     file.close();
 
                                     //Add the data into the buffer replacing the include statement
@@ -4976,6 +4977,7 @@ MainWindow::replyFinished(
 
                             //Remove all extra #include statments
                             tmpData.replace("#include", "");
+                            tmpData.append('\n');
 
                             //Set the total number of lines for the original file
                             lstFileData.at(0)->iEndingLine = tmpData.count("\n");
