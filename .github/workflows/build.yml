@@ -43,16 +43,12 @@ jobs:
           qmake -o Makefile UwTerminalX.pro -spec linux-g++ CONFIG+=qtquickcompiler
           make
           strip UwTerminalX
-          curl -o codes.csv http://uwterminalx.ezurio.com/codes.csv
-          curl -o Help.pdf http://uwterminalx.ezurio.com/Help.pdf
       - name: Upload build artifacts
         uses: actions/upload-artifact@v4
         with:
           name: UwTerminalX_v${{ env.UWTERMINALX_VERSION }}_qt${{ matrix.qt_version }}-linux_dynamic
           path: |
             UwTerminalX
-            codes.csv
-            Help.pdf
         env:
           UWTERMINALX_VERSION: ${{ needs.get_version.outputs.version }}
   linux_static:
@@ -124,16 +120,12 @@ jobs:
           ${{ runner.temp }}/Qt${{ matrix.qt_version }}-static/bin/qmake -o Makefile UwTerminalX.pro -spec linux-g++ CONFIG+=qtquickcompiler
           make
           strip UwTerminalX
-          curl -o codes.csv http://uwterminalx.ezurio.com/codes.csv
-          curl -o Help.pdf http://uwterminalx.ezurio.com/Help.pdf
       - name: Upload build artifacts
         uses: actions/upload-artifact@v4
         with:
           name: UwTerminalX_v${{ env.UWTERMINALX_VERSION }}_qt${{ matrix.qt_version }}-linux_static
           path: |
             UwTerminalX
-            codes.csv
-            Help.pdf
         env:
           UWTERMINALX_VERSION: ${{ needs.get_version.outputs.version }}
   windows_dynamic:
@@ -165,16 +157,12 @@ jobs:
           nmake.exe clean
           set CL=/MP
           nmake.exe release
-          curl -o release/help.pdf http://uwterminalx.ezurio.com/help.pdf
-          curl -o release/codes.csv http://uwterminalx.ezurio.com/codes.csv
       - name: Upload build artifacts
         uses: actions/upload-artifact@v4
         with:
           name: UwTerminalX_v${{ env.UWTERMINALX_VERSION }}_qt${{ matrix.qt_version }}-windows_dynamic
           path: |
             release/UwTerminalX.exe
-            release/help.pdf
-            release/codes.csv
         env:
           UWTERMINALX_VERSION: ${{ needs.get_version.outputs.version }}
   windows_static:
@@ -235,16 +223,12 @@ jobs:
           nmake.exe clean
           set CL=/MP
           nmake.exe release
-          curl -o release/help.pdf http://uwterminalx.ezurio.com/help.pdf
-          curl -o release/codes.csv http://uwterminalx.ezurio.com/codes.csv
       - name: Upload build artifacts
         uses: actions/upload-artifact@v4
         with:
           name: UwTerminalX_v${{ env.UWTERMINALX_VERSION }}_qt${{ matrix.qt_version }}-windows_static
           path: |
             release/UwTerminalX.exe
-            release/help.pdf
-            release/codes.csv
         env:
           UWTERMINALX_VERSION: ${{ needs.get_version.outputs.version }}
   macos_dynamic:
@@ -270,16 +254,12 @@ jobs:
         run: |
           qmake -o Makefile UwTerminalX.pro CONFIG+=qtquickcompiler
           make
-          curl -o codes.csv http://uwterminalx.ezurio.com/codes.csv
-          curl -o Help.pdf http://uwterminalx.ezurio.com/Help.pdf
       - name: Upload build artifacts
         uses: actions/upload-artifact@v4
         with:
           name: UwTerminalX_v${{ env.UWTERMINALX_VERSION }}_qt${{ matrix.qt_version }}-macos_dynamic
           path: |
             UwTerminalX.app
-            codes.csv
-            Help.pdf
         env:
           UWTERMINALX_VERSION: ${{ needs.get_version.outputs.version }}
   macos_static:
@@ -337,15 +317,11 @@ jobs:
         run: |
           ${{ runner.temp }}/Qt${{ matrix.qt_version }}-static/bin/qmake -o Makefile UwTerminalX.pro CONFIG+=qtquickcompiler
           make
-          curl -o codes.csv http://uwterminalx.ezurio.com/codes.csv
-          curl -o Help.pdf http://uwterminalx.ezurio.com/Help.pdf
       - name: Upload build artifacts
         uses: actions/upload-artifact@v4
         with:
           name: UwTerminalX_v${{ env.UWTERMINALX_VERSION }}_qt${{ matrix.qt_version }}-macos_static
           path: |
             UwTerminalX.app
-            codes.csv
-            Help.pdf
         env:
           UWTERMINALX_VERSION: ${{ needs.get_version.outputs.version }}
